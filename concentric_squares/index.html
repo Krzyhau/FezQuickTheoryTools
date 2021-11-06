@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FEZ Concentric Squares Viewer</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body{
+            margin:0;
+            padding:0;
+            font-family: sans-serif;
+            display:flex;
+            width:100vw;
+            height:100vh;
+            overflow: hidden;
+            font-size: 14pt;
+        }
+        #viewer{
+            display:flex;
+            justify-content: center;
+            align-items: center;
+            background:#444;
+            height:100%;
+            flex-grow: 1;
+        }
+        #viewer .circle{
+            position:absolute;
+            width:calc(100vmin - 10em);
+            image-rendering: pixelated;
+        }
+        #viewer .circle.hidden{
+            display:none;
+        }
+
+        #layers{
+            background-color: #222;
+            width:10em;
+            color:white;
+        }
+
+        #layers .layer{
+            display:flex;
+            background:#333;
+            margin-top:0.5em;
+        }
+
+        #layers .layer b{
+            font-size:1.8em;
+            line-height: 130%;
+            padding: 0 0.3em;
+        }
+
+        #layers .btn{
+            cursor:pointer;
+            background:#555;
+            margin:0.2em;
+            padding:0.4em;
+            text-align: center;
+            text-transform: uppercase;
+            user-select: none;
+        }
+
+        #layers .btn:hover{
+            background:#444;
+        }
+
+        #layers .layer.hidden{
+            background:#2A2A2A;
+        }
+
+        #layers .layer.hidden b{
+            color:#555;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="viewer">
+        <img class="circle" id="circle1" src="circle1.png">
+        <img class="circle" id="circle2" src="circle2.png">
+        <img class="circle" id="circle3" src="circle3.png">
+        <img class="circle" id="circle4" src="circle4.png">
+        <img class="circle" id="circle5" src="circle5.png">
+        <img class="circle" id="circle6" src="circle6.png">
+        <img class="circle" id="circle7" src="circle7.png">
+        <img class="circle" id="circle8" src="circle8.png">
+    </div>
+    <div id="layers">
+
+    </div>
+
+    <script>
+        let rotations = [];
+
+        function toggleLayer(i){
+            console.log(i);
+            let layer = $("#layer"+i);
+            let circle = $("#circle"+i);
+            
+            circle.toggleClass("hidden", !layer.hasClass("hidden"));
+            layer.toggleClass("hidden", !layer.hasClass("hidden"));
+        }
+
+        function rotateLayer(i,right){
+            let rotation = rotations[i] ?? 0;
+            rotation += right ? 90 : -90;
+            $("#circle" + i).css("transform", "rotate("+rotation+"deg)");
+            rotations[i] = rotation;
+        }
+
+        function reset(i){
+            rotations[i] = 0;
+            $("#circle" + i).css("transform", "rotate(" + rotations[i] + "deg)");
+            if($("#layer" + i).hasClass("hidden")) toggleLayer(i);
+        }
+
+        function shuffle(){
+            for(let i=1;i<=8;i++){
+                rotations[i] = Math.floor(Math.random()*4)*90;
+                $("#circle" + i).css("transform", "rotate(" + rotations[i] + "deg)");
+            }
+        }
+
+        $("<div>", { class: "info"}).html("Shuffle rot").html(
+            "V - toggle visibility<br>L/R - rotate left/right<br>C - reset"
+        ).appendTo($("#layers"));
+        for(let i=1;i<=8;i++){
+            let layerDiv = $("<div>",{class:"layer", id:"layer"+i}).appendTo($("#layers"));
+            $("<b>").html(i).appendTo(layerDiv);
+            $("<div>", { class: "btn" }).html("V").on("click", () => toggleLayer(i)).appendTo(layerDiv);
+            $("<div>", { class: "btn" }).html("L").on("click", () => rotateLayer(i,false)).appendTo(layerDiv);
+            $("<div>", { class: "btn" }).html("R").on("click", () => rotateLayer(i,true)).appendTo(layerDiv);
+            $("<div>", { class: "btn" }).html("C").on("click", () => reset(i)).appendTo(layerDiv);
+        }
+        $("<div>", { class: "btn",id:"shuffle" }).html("Shuffle rot").on("click", () => shuffle()).appendTo($("#layers"));
+
+    </script>
+</body>
+</html>
